@@ -1,0 +1,6 @@
+define plus(a, b) {
+    return a + b
+}
+
+var x = plus(2, 3)
+print(x)
