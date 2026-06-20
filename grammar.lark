@@ -1,0 +1,110 @@
+?start: cmd+
+
+cmd: wait
+    | repeat
+    | forever
+    | if_
+    | var
+    | assignment
+    | append
+    | delete
+    | insert
+    | print_
+    | define
+    | return_
+    | function_call
+
+define: "define" CNAME "(" [param_list] ")" "{" cmd* "}"
+param_list: CNAME ("," CNAME)*
+return_: "return" value
+
+wait: "wait" ("(" expr ")" | "<" bool_expr ">")
+repeat: "repeat" ("(" expr ")" | "<" bool_expr ">") "{" cmd* "}"
+forever: "forever" "{" cmd* "}"
+if_: "if" "<" bool_expr ">" then_block ["else" else_block]
+var: ("var" | "list") var_name "=" value
+assignment: var_name "=" value
+append: var_name ".add" "(" value ")"
+delete: var_name ".delete" "(" (expr | "all") ")"
+insert: var_name ".insert" "(" value "at" expr ")"
+item: var_name ".item" "(" value ")"
+length_list: var_name ".length"
+print_: "print" "(" value ")"
+
+then_block: "{" cmd* "}"
+else_block: "{" cmd* "}"
+?value: array | string | boolean | expr | join | letter
+array: "[" [value ("," value)*] "]"
+?expr: product 
+    | expr "+" product -> add
+    | expr "-" product -> subtract
+?product: atom
+    | product "*" atom -> multiply
+    | product "/" atom -> divide
+    | product "mod" atom -> mod
+    | product "^" atom -> pow
+?atom: "(" expr ")"
+    | function_call
+    | var_name
+    | number
+    | negative
+    | random
+    | length
+    | round
+    | abs
+    | floor
+    | ceiling
+    | sqrt
+    | sin
+    | cos
+    | tan
+    | asin
+    | acos
+    | atan
+    | ln
+    | log
+    | napier
+    | item
+    | length_list
+?bool_expr: equal | greater | less | and_ | or_ | not_ | contains
+negative: "-" atom
+random: "random" "(" expr "to" expr ")"
+equal: value "==" value
+greater: value ">" value
+less: value "<" value
+and_: "<" bool_expr ">" "and" "<" bool_expr ">"
+or_: "<" bool_expr ">" "or" "<" bool_expr ">"
+not_: "not" "<" bool_expr ">"
+join: "join" "(" value "," value ")"
+letter: "letter" "(" expr "of" value ")"
+length: "length" "(" value ")"
+contains: value "contains" value
+round: "round" "(" expr ")"
+abs: "abs" "(" expr ")"
+floor: "floor" "(" expr ")"
+ceiling: "ceiling" "(" expr ")"
+sqrt: "sqrt" "(" expr ")"
+sin: "sin" "(" expr ")"
+cos: "cos" "(" expr ")"
+tan: "tan" "(" expr ")"
+asin: "asin" "(" expr ")"
+acos: "acos" "(" expr ")"
+atan: "atan" "(" expr ")"
+ln: "ln" "(" expr ")"
+log: "log" "(" expr ")"
+napier: "e"
+function_call: CNAME "(" [arg_list] ")"
+arg_list: value ("," value)*
+var_name: CNAME ["[" value "]"]
+number: NUMBER
+string: ESCAPED_STRING
+boolean: BOOLEAN
+
+BOOLEAN: "true" | "false"
+
+%import common.NUMBER
+%import common.ESCAPED_STRING
+%import common.CNAME
+%import common.WS
+
+%ignore WS
